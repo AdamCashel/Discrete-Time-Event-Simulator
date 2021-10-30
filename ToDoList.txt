@@ -1,0 +1,9 @@
+Part1: Initialization
+  Implement First Come First Serve
+  Implement Shortest Remaining Time First
+  Implement Round Robin with quantum value
+
+Part2: Run simulation
+
+Part3: Generate Report
+  Create plot with 4 metrics for each alogrithm
