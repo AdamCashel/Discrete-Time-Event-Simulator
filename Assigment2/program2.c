@@ -14,6 +14,7 @@ struct event{
   float time;
   int   type;
   // add more fields
+  int enter_time;
   struct event* next;
 };
 
@@ -36,6 +37,11 @@ void init()
 {
 	// initialize all varilables, states, and end conditions
 	// schedule first events
+	bool server_idle = false;
+	clock = 0;
+	int state = 0;
+	head->time = 0;
+	head->next = NULL;
 }
 ////////////////////////////////////////////////////////////////
 void generate_report()
@@ -47,6 +53,21 @@ void generate_report()
 int schedule_event(struct event* new)
 {
 	// insert event in the event queue in its order of time
+	//Check if theres an event after the event queue head node, if not place event after head node
+	//If there is a node then place the node based on the time
+	if(head->next == NULL)
+	{
+		head->next = new;
+	}
+	else
+	{
+		//Place the input event based on the enter_time of the even in the orgainized queue based on enter_time
+		struct event* temp = head;
+		while(temp->next != NULL)
+		{
+
+		}
+	}
 }
 ////////////////////////////////////////////////////////////////
 // returns a random number between 0 and 1
@@ -100,6 +121,12 @@ int run_sim()
 int main(int argc, char *argv[] )
 {
   // parse arguments
+  if(argc == 1){
+
+  }
+  //If algorithm_type == 1 run First Come First Serve , If algorithm_type == 2 run Shortest Remaining Time First, If algorithm_type == 3 run Round Robin with quantum value
+  int algorithm_type = argv[1]
+
   init();
   run_sim(); 
   generate_report();
