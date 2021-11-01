@@ -62,10 +62,22 @@ int schedule_event(struct event* new)
 	else
 	{
 		//Place the input event based on the enter_time of the even in the orgainized queue based on enter_time
-		struct event* temp = head;
-		while(temp->next != NULL)
-		{
+		struct event* current_node = head;
+		struct event* previous_node = head;
+		bool found = true;
 
+		while(current_node->next != NULL && found != false)
+		{
+			//Deal with condition of the node belongs to first node
+			previous_node = head;
+			current_node = current_node->next;
+
+			if(current_node->enter_time >= new->enter_time)
+			{
+				previous_node->next = new;
+				new->next = current_node;
+				found = false;
+			}
 		}
 	}
 }
