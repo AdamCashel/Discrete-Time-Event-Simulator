@@ -31,12 +31,23 @@ int process_event2(struct event* eve);
 void FCFS();
 void SRTF();
 void RR(int);
+
+////////////////////////////////////////////////////////////////
+//Global variables
+struct event* head; // head of event queue
+float clock; // simulation clock
+float process_lamda;
+float average_arrival;
+float quantum_number;
+int algorithm_type;
+
 ////////////////////////////////////////////////////////////////
 //FCFC
 void FCFS()
 {
-
+	
 }
+
 ////////////////////////////////////////////////////////////////
 //SRTF
 void SRTF()
@@ -51,15 +62,6 @@ void RR(int quantum_number)
 
 }
 
-////////////////////////////////////////////////////////////////
-//Global variables
-struct event* head; // head of event queue
-float clock; // simulation clock
-float process_lamda;
-float average_arrival;
-float quantum_number;
-int algorithm_type;
-////////////////////////////////////////////////////////////////
 void init()
 {
 	// initialize all varilables, states, and end conditions
