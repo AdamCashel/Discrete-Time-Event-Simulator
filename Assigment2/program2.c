@@ -4,17 +4,19 @@
 
 ////////////////////////////////////////////////////////////////
 // sample events
-#define EVENT1 1
-#define EVENT2 2
+//Events are used to change the State(the amount of processes in the Ready Queue)
+#define EVENT1 1 //Process Arrival
+#define EVENT2 2 //Process Completion
+#define EVENT3 3 //Time-Slice Occurance
 // .. add more events
 
 ////////////////////////////////////////////////////////////////     
 //event structure
 struct event{
-  float time;
+  float time; //service time
   int   type;
   // add more fields
-  int enter_time;
+  float enter_time; //arrival time
   struct event* next;
 };
 
@@ -31,7 +33,9 @@ int process_event2(struct event* eve);
 //Global variables
 struct event* head; // head of event queue
 float clock; // simulation clock
-
+float process_lamda;
+float average_arrival;
+float quantum_number;
 ////////////////////////////////////////////////////////////////
 void init()
 {
@@ -42,6 +46,22 @@ void init()
 	int state = 0;
 	head->time = 0;
 	head->next = NULL;
+
+	/*Generate over 10,000 process based on the average arrival time and average service time and if RR 
+	quantum number but will stop after 10,000 processes have been served by the given alogrithm */
+	for(int i = 0; i < 10000; i++)
+	{
+		struct event* temp;
+		temp->enter_time = genexp(average_arrival);
+		temp->time = genexp(process_lamda);
+		temp->type
+		//Put process into event queue through scedule_event function
+		schedule_event(temp);
+	}
+
+
+
+
 }
 ////////////////////////////////////////////////////////////////
 void generate_report()
@@ -121,6 +141,7 @@ int run_sim()
 
 	default:	
 		// error 
+		std:cout << "Error" << std:endl;
 	}
 
       head = eve->next;
@@ -132,13 +153,22 @@ int run_sim()
 ////////////////////////////////////////////////////////////////
 int main(int argc, char *argv[] )
 {
-  // parse arguments
-  if(argc == 1){
-
-  }
+  //First Argument: scheduling algorithm number (1 to 3)
+  //Second Argument: number of processes per second as the arrival rate, lamda
+  //Third Argument: the average burst time for processes
+  //Fourth Argument: quantum value (used for RR only)
+  //parse arguments
   //If algorithm_type == 1 run First Come First Serve , If algorithm_type == 2 run Shortest Remaining Time First, If algorithm_type == 3 run Round Robin with quantum value
-  int algorithm_type = argv[1]
 
+  int algorithm_type = argv[1];
+  process_lamda = argv[2];
+  average_arrival = argv[3];
+
+  if(argc == 4)
+  {
+	quantum_number = argv[4];
+  }
+  
   init();
   run_sim(); 
   generate_report();
