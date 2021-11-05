@@ -28,6 +28,28 @@ void generate_report();
 int schedule_event(struct event*);
 int process_event1(struct event* eve);
 int process_event2(struct event* eve);
+void FCFS();
+void SRTF();
+void RR(int);
+////////////////////////////////////////////////////////////////
+//FCFC
+void FCFS()
+{
+
+}
+////////////////////////////////////////////////////////////////
+//SRTF
+void SRTF()
+{
+
+}
+
+////////////////////////////////////////////////////////////////
+//RR
+void RR(int quantum_number)
+{
+
+}
 
 ////////////////////////////////////////////////////////////////
 //Global variables
@@ -36,6 +58,7 @@ float clock; // simulation clock
 float process_lamda;
 float average_arrival;
 float quantum_number;
+int algorithm_type;
 ////////////////////////////////////////////////////////////////
 void init()
 {
@@ -160,7 +183,7 @@ int main(int argc, char *argv[] )
   //parse arguments
   //If algorithm_type == 1 run First Come First Serve , If algorithm_type == 2 run Shortest Remaining Time First, If algorithm_type == 3 run Round Robin with quantum value
 
-  int algorithm_type = argv[1];
+  algorithm_type = argv[1];
   process_lamda = argv[2];
   average_arrival = argv[3];
 
