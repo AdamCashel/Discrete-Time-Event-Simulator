@@ -35,17 +35,22 @@ void RR(int);
 ////////////////////////////////////////////////////////////////
 //Global variables
 struct event* head; // head of event queue
+struct event* readyque_head;
 float clock; // simulation clock
 float process_lamda;
 float average_arrival;
 float quantum_number;
 int algorithm_type;
-
+bool server_idle;
+int readyque_count = 0;
 ////////////////////////////////////////////////////////////////
 //FCFC
 void FCFS()
 {
+	//Keep track of top node in ready queue
+	struct event* top = readyque_head;
 	
+
 }
 
 ////////////////////////////////////////////////////////////////
@@ -62,6 +67,52 @@ void RR(int quantum_number)
 
 }
 
+////////////////////////////////////////////////////////////////
+//
+int process_event1(eve)
+{
+	if(server_idle == true)
+	{
+		server_idle = false;
+		//schedule event
+	}
+	else
+	{
+		readque_count++;
+	}
+	//scehdule event
+}
+
+////////////////////////////////////////////////////////////////
+//
+int process_event2(eve)
+{
+
+}
+
+////////////////////////////////////////////////////////////////
+//
+int process_event3(eve)
+{
+
+}
+
+////////////////////////////////////////////////////////////////
+//
+int process_event4(eve)
+{
+	if(readyque_count == 0)
+	{
+		server_idle = true;
+	}
+	else
+	{
+		readyque_count--;
+		//schedule event
+	}
+}
+
+////////////////////////////////////////////////////////////////
 void init()
 {
 	// initialize all varilables, states, and end conditions
@@ -79,12 +130,10 @@ void init()
 		struct event* temp;
 		temp->enter_time = genexp(average_arrival);
 		temp->time = genexp(process_lamda);
-		temp->type
+		temp->type = 
 		//Put process into event queue through scedule_event function
 		schedule_event(temp);
 	}
-
-
 
 
 }
@@ -156,12 +205,15 @@ int run_sim()
       switch (eve->type)
 	{
 	case EVENT1:
-		process_event1(eve);
+		process_event1(eve); //process arrival event
 		break;
 	case EVENT2:
-		process_event2(eve);
+		process_event2(eve); //process completion
 		break;
-
+	case EVENT3:
+		process_event3(eve); //time-slice occurrence event
+	case EVENT4:
+		process_event4(eve); //process leaves event
 	// add more events
 
 	default:	
