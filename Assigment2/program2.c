@@ -56,6 +56,7 @@ float clock1; // simulation clock
 float process_lamda;
 float average_arrival;
 float quantum_number;
+float Total_turnaround = 0;
 int algorithm_type;
 bool server_idle; //replace with using process* server pointing to the process being serviced, NULL indicates idle
 int readyque_count = 0; //Replace with FIFO queue (or more general, a priority queue) of processes (pointers to processes)
@@ -108,16 +109,8 @@ void process_event1(struct event* eve)
 //process completion
 void process_event2(struct event* eve)
 {
-	if(readyque_count == 0)
-	{
-		server_idle = true;
-	}
-	else
-	{
-		readyque_count--;
-		//schedule event
-		
-	}
+	//collect data
+	Total_turnaround += (clock1 - eve->enter_time);
 }
 
 ////////////////////////////////////////////////////////////////
@@ -194,6 +187,8 @@ void init()
 void generate_report()
 {
 	// output statistics
+	float average_turnaround = 10000 / Total_turnaround;
+	std::cout << average_turnaround << std::endl;
 }
 //////////////////////////////////////////////////////////////// 
 //schedules an event in the future
@@ -270,7 +265,7 @@ int main(int argc, char *argv[] )
   //Fourth Argument: quantum value (used for RR only)
   //parse arguments
   //If algorithm_type == 1 run First Come First Serve , If algorithm_type == 2 run Shortest Remaining Time First, If algorithm_type == 3 run Round Robin with quantum value
-
+  std::cout << "start" << std::endl;
   algorithm_type = atoi(argv[1]);
   process_lamda = atoi(argv[2]);
   average_arrival = atoi(argv[3]);
@@ -283,5 +278,6 @@ int main(int argc, char *argv[] )
   init();
   run_sim(); 
   generate_report();
+  std::cout << "end" << std::endl;
   return 0;
 }
