@@ -29,7 +29,7 @@ struct event{
   // add more fields
   float enter_time; //arrival time
   struct event* next;
-  process* p;
+  struct process* p;
 };
 
 ////////////////////////////////////////////////////////////////
@@ -55,14 +55,26 @@ float quantum_number;
 int algorithm_type;
 bool server_idle; //replace with using process* server pointing to the process being serviced, NULL indicates idle
 int readyque_count = 0; //Replace with FIFO queue (or more general, a priority queue) of processes (pointers to processes)
+
+//Alogrithms add events to the event queue
+
 ////////////////////////////////////////////////////////////////
 //FCFC
 void FCFS()
 {
 	//Keep track of top node in ready queue
-	struct event* top = readyque_head;
-	
+	//struct event* top = readyque_head;
 
+	struct process* current_process = NULL;
+	struct event* new_event;
+	struct event* current_event = head;
+	current_event = current_event->next;
+	current_process = current_event->p;
+	
+	new_event->enter_time = (current_event->enter_time) + (current_process->serviceTime);
+	new_event->type = 2; //Event type is completion
+	//Call schedule event and place the event into the event queue
+	schedule_event(current_node);
 }
 
 ////////////////////////////////////////////////////////////////
@@ -80,26 +92,37 @@ void RR(int quantum_number)
 }
 
 ////////////////////////////////////////////////////////////////
-//
+//Arrival Event
 int process_event1(eve)
 {
 	if(server_idle == true)
 	{
 		server_idle = false;
 		//schedule event
+		schedule_event();
 	}
 	else
 	{
 		readque_count++;
 	}
 	//scehdule event
+	schedule_event();
 }
 
 ////////////////////////////////////////////////////////////////
-//
+//process completion
 int process_event2(eve)
 {
-
+	if(readyque_count == 0)
+	{
+		server_idle = true;
+	}
+	else
+	{
+		readyque_count--;
+		//schedule event
+		schedule_event();
+	}
 }
 
 ////////////////////////////////////////////////////////////////
@@ -113,15 +136,7 @@ int process_event3(eve)
 //
 int process_event4(eve)
 {
-	if(readyque_count == 0)
-	{
-		server_idle = true;
-	}
-	else
-	{
-		readyque_count--;
-		//schedule event
-	}
+	
 }
 
 ////////////////////////////////////////////////////////////////
@@ -134,16 +149,26 @@ void init()
 	int state = 0;
 	head->time = 0;
 	head->next = NULL;
-
+	srand (time(NULL));
 	/*Generate over 10,000 process based on the average arrival time and average service time and if RR 
 	quantum number but will stop after 10,000 processes have been served by the given alogrithm */
 	for(int i = 0; i < 10000; i++)
 	{
+		//Make new process
+		struct process* process_temp;
+		//process_temp->arrivalTime =
+		process_temp->id = rand() % 900000 + 1;
+		process_temp->remainingServiceTime = process_temp->arrivalTime;
+		process_temp->serviceTime = 0;
+		process_temp->priority = 0;
+
+		//Make new event that has the arrival time of the process
 		struct event* temp;
 		temp->enter_time = genexp(average_arrival);
 		temp->time = genexp(process_lamda);
 		temp->type = 1;
-		//Put process into event queue through scedule_event function
+		temp->p = process_temp;
+		//Put event into event queue through scedule_event function
 		schedule_event(temp);
 	}
 
@@ -178,7 +203,7 @@ int schedule_event(struct event* new)
 			previous_node = head;
 			current_node = current_node->next;
 
-			if(current_node->enter_time >= new->enter_time)
+			if(current_node->enter_time <= new->enter_time)
 			{
 				previous_node->next = new;
 				new->next = current_node;
@@ -225,7 +250,7 @@ int run_sim()
 	case EVENT3:
 		process_event3(eve); //time-slice occurrence event
 	case EVENT4:
-		process_event4(eve); //process leaves event
+		process_event4(eve); 
 	// add more events
 
 	default:	
