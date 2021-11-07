@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>   
+#include <iostream>
 
 ////////////////////////////////////////////////////////////////
 // sample events
@@ -19,7 +21,7 @@ struct process{
 	float remainingServiceTime;
 	int priority;
 	//add more
-}
+};
 
 ////////////////////////////////////////////////////////////////     
 //event structure
@@ -37,9 +39,11 @@ struct event{
 void init();
 int run_sim();
 void generate_report();
-int schedule_event(struct event*);
-int process_event1(struct event* eve);
-int process_event2(struct event* eve);
+void schedule_event(struct event*);
+void process_event1(struct event* eve);
+void process_event2(struct event* eve);
+void process_event3(struct event* eve);
+void process_event4(struct event* eve);
 void FCFS();
 void SRTF();
 void RR(int);
@@ -48,7 +52,7 @@ void RR(int);
 //Global variables
 struct event* head; // head of event queue
 struct event* readyque_head;
-float clock; // simulation clock
+float clock1; // simulation clock
 float process_lamda;
 float average_arrival;
 float quantum_number;
@@ -60,21 +64,19 @@ int readyque_count = 0; //Replace with FIFO queue (or more general, a priority q
 
 ////////////////////////////////////////////////////////////////
 //FCFC
-void FCFS()
+void FCFS(struct event* current_event)
 {
 	//Keep track of top node in ready queue
 	//struct event* top = readyque_head;
 
 	struct process* current_process = NULL;
 	struct event* new_event;
-	struct event* current_event = head;
-	current_event = current_event->next;
 	current_process = current_event->p;
 	
 	new_event->enter_time = (current_event->enter_time) + (current_process->serviceTime);
 	new_event->type = 2; //Event type is completion
 	//Call schedule event and place the event into the event queue
-	schedule_event(current_node);
+	schedule_event(current_event);
 }
 
 ////////////////////////////////////////////////////////////////
@@ -93,25 +95,18 @@ void RR(int quantum_number)
 
 ////////////////////////////////////////////////////////////////
 //Arrival Event
-int process_event1(eve)
+void process_event1(struct event* eve)
 {
-	if(server_idle == true)
+	if(algorithm_type = 1)
 	{
-		server_idle = false;
-		//schedule event
-		schedule_event();
+		FCFS(eve);
 	}
-	else
-	{
-		readque_count++;
-	}
-	//scehdule event
-	schedule_event();
+	
 }
 
 ////////////////////////////////////////////////////////////////
 //process completion
-int process_event2(eve)
+void process_event2(struct event* eve)
 {
 	if(readyque_count == 0)
 	{
@@ -121,22 +116,43 @@ int process_event2(eve)
 	{
 		readyque_count--;
 		//schedule event
-		schedule_event();
+		
 	}
 }
 
 ////////////////////////////////////////////////////////////////
 //
-int process_event3(eve)
+void process_event3(struct event* eve)
 {
 
 }
 
 ////////////////////////////////////////////////////////////////
 //
-int process_event4(eve)
+void process_event4(struct event* eve)
 {
 	
+}
+
+////////////////////////////////////////////////////////////////
+// returns a random number between 0 and 1
+float urand()
+{
+	return( (float) rand()/RAND_MAX );
+}
+
+/////////////////////////////////////////////////////////////
+// returns a random number that follows an exp distribution
+float genexp(float lambda)
+{
+	float u,x;
+	x = 0;
+	while (x == 0)
+		{
+			u = urand();
+			x = (-1/lambda)*log(u);
+		}
+	return(x);
 }
 
 ////////////////////////////////////////////////////////////////
@@ -145,7 +161,7 @@ void init()
 	// initialize all varilables, states, and end conditions
 	// schedule first events
 	bool server_idle = false;
-	clock = 0;
+	clock1 = 0;
 	int state = 0;
 	head->time = 0;
 	head->next = NULL;
@@ -181,14 +197,14 @@ void generate_report()
 }
 //////////////////////////////////////////////////////////////// 
 //schedules an event in the future
-int schedule_event(struct event* new)
+void schedule_event(struct event* new1)
 {
 	// insert event in the event queue in its order of time
 	//Check if theres an event after the event queue head node, if not place event after head node
 	//If there is a node then place the node based on the time
 	if(head->next == NULL)
 	{
-		head->next = new;
+		head->next = new1;
 	}
 	else
 	{
@@ -203,42 +219,25 @@ int schedule_event(struct event* new)
 			previous_node = head;
 			current_node = current_node->next;
 
-			if(current_node->enter_time <= new->enter_time)
+			if(current_node->enter_time <= new1->enter_time)
 			{
-				previous_node->next = new;
-				new->next = current_node;
+				previous_node->next = new1;
+				new1->next = current_node;
 				found = false;
 			}
 		}
 	}
 }
-////////////////////////////////////////////////////////////////
-// returns a random number between 0 and 1
-float urand()
-{
-	return( (float) rand()/RAND_MAX );
-}
-/////////////////////////////////////////////////////////////
-// returns a random number that follows an exp distribution
-float genexp(float lambda)
-{
-	float u,x;
-	x = 0;
-	while (x == 0)
-		{
-			u = urand();
-			x = (-1/lambda)*log(u);
-		}
-	return(x);
-}
+
 ////////////////////////////////////////////////////////////
 int run_sim()
 {
+  
   struct event* eve;
-  while (!end_condition)
+  while (head)
     {
       eve = head;
-      clock = eve->time;
+      clock1 = eve->time;
       switch (eve->type)
 	{
 	case EVENT1:
@@ -249,13 +248,11 @@ int run_sim()
 		break;
 	case EVENT3:
 		process_event3(eve); //time-slice occurrence event
-	case EVENT4:
-		process_event4(eve); 
 	// add more events
 
 	default:	
 		// error 
-		std:cout << "Error" << std:endl;
+		std::cout << "Error" << std::endl;
 	}
 
       head = eve->next;
@@ -274,13 +271,13 @@ int main(int argc, char *argv[] )
   //parse arguments
   //If algorithm_type == 1 run First Come First Serve , If algorithm_type == 2 run Shortest Remaining Time First, If algorithm_type == 3 run Round Robin with quantum value
 
-  algorithm_type = argv[1];
-  process_lamda = argv[2];
-  average_arrival = argv[3];
+  algorithm_type = atoi(argv[1]);
+  process_lamda = atoi(argv[2]);
+  average_arrival = atoi(argv[3]);
 
   if(argc == 4)
   {
-	quantum_number = argv[4];
+	quantum_number = atoi(argv[4]);
   }
   
   init();
