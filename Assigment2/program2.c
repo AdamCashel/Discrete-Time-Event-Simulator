@@ -10,6 +10,17 @@
 #define EVENT3 3 //Time-Slice Occurance
 // .. add more events
 
+////////////////////////////////////////////////////////////////
+// Process Structure
+struct process{
+	int id;
+	float arrivalTime;
+	float serviceTime;
+	float remainingServiceTime;
+	int priority;
+	//add more
+}
+
 ////////////////////////////////////////////////////////////////     
 //event structure
 struct event{
@@ -18,6 +29,7 @@ struct event{
   // add more fields
   float enter_time; //arrival time
   struct event* next;
+  process* p;
 };
 
 ////////////////////////////////////////////////////////////////
@@ -41,8 +53,8 @@ float process_lamda;
 float average_arrival;
 float quantum_number;
 int algorithm_type;
-bool server_idle;
-int readyque_count = 0;
+bool server_idle; //replace with using process* server pointing to the process being serviced, NULL indicates idle
+int readyque_count = 0; //Replace with FIFO queue (or more general, a priority queue) of processes (pointers to processes)
 ////////////////////////////////////////////////////////////////
 //FCFC
 void FCFS()
@@ -130,7 +142,7 @@ void init()
 		struct event* temp;
 		temp->enter_time = genexp(average_arrival);
 		temp->time = genexp(process_lamda);
-		temp->type = 
+		temp->type = 1;
 		//Put process into event queue through scedule_event function
 		schedule_event(temp);
 	}
@@ -222,7 +234,7 @@ int run_sim()
 	}
 
       head = eve->next;
-      free(eve);
+      free(eve); //delete eve
       eve = NULL;
     }
   return 0;
