@@ -191,6 +191,7 @@ void init()
 	//Print linked list to check if in order of time
 	struct event* temp4 = new event;
 	temp4 = head;
+	
 	std::cout << "Before Check" << std::endl;
 	while (temp4 != nullptr)
 	{
@@ -215,30 +216,34 @@ void schedule_event(struct event* new1)
 	// insert event in the event queue in its order of time
 	//Check if theres an event after the event queue head node, if not place event after head node
 	//If there is a node then place the node based on the time
-	if (head->next == NULL)
+	if (head == NULL)
 	{
-		head->next = new1;
+		head = new1;
 	}
 	else
 	{
 		//Place the input event based on the enter_time of the even in the orgainized queue based on enter_time
 		struct event* current_node = head;
-		struct event* previous_node = head;
+		struct event* previous_node = NULL;
 		bool found = true;
 
-		while (current_node->next != NULL && found != false)
+		while (current_node != NULL && current_node->enter_time < new1->enter_time)
 		{
-			//Deal with condition of the node belongs to first node
-			previous_node = head;
+			previous_node = current_node;
 			current_node = current_node->next;
-
-			if (current_node->enter_time >= new1->enter_time)
-			{
-				previous_node->next = new1;
-				new1->next = current_node;
-				found = false;
-			}
 		}
+
+		if (previous_node == NULL)
+		{
+			head = new1;
+			new1->next = current_node;
+		}
+		else
+		{
+			previous_node->next = new1;
+			new1->next = current_node;
+		}
+		
 	}
 }
 
