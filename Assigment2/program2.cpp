@@ -36,7 +36,7 @@ struct event {
 
 ////////////////////////////////////////////////////////////////
 // function definition
-void init(struct event*);
+void init();
 int run_sim();
 void generate_report();
 void schedule_event(struct event*);
@@ -50,7 +50,7 @@ void RR(int);
 
 ////////////////////////////////////////////////////////////////
 //Global variables
-struct event* head;// head of event queue
+struct event* head = new event;// head of event queue
 struct event* readyque_head;
 float clock1; // simulation clock
 float process_lamda;
@@ -70,8 +70,8 @@ void FCFS(struct event* current_event)
 	//Keep track of top node in ready queue
 	//struct event* top = readyque_head;
 
-	struct process* current_process = NULL;
-	struct event* new_event = NULL;
+	struct process* current_process = new process;
+	struct event* new_event = new event;
 	current_process = current_event->p;
 
 	new_event->enter_time = (current_event->enter_time) + (current_process->serviceTime);
@@ -98,7 +98,7 @@ void RR(int quantum_number)
 //Arrival Event
 void process_event1(struct event* eve)
 {
-	if (algorithm_type = 1)
+	if (algorithm_type == 1)
 	{
 		FCFS(eve);
 	}
@@ -154,40 +154,52 @@ void init()
 
 	// initialize all varilables, states, and end conditions
 	// schedule first events
-	
-	std::cout << "start of init" << std::endl;
+	head->enter_time = 0;
+	//std::cout << "start of init" << std::endl;
 	bool server_idle = false;
 	clock1 = 0;
-	std::cout << "start of init5" << std::endl;
+	//std::cout << "start of init5" << std::endl;
 	int state = 0;
 	srand(time(NULL));
 	/*Generate over 10,000 process based on the average arrival time and average service time and if RR
 	quantum number but will stop after 10,000 processes have been served by the given alogrithm */
 	for (int i = 0; i < 10000; i++)
 	{
-		std::cout << "start of init2" << std::endl;
+		//std::cout << "start of init2" << std::endl;
 		//Make new process
-		process process_temp;
+		process* process_temp = new process;
 		//process_temp->arrivalTime =
-		std::cout << "start of init222" << std::endl;
-		process_temp.id = rand() % 900000 + 1;
-		std::cout << "start of init2333" << std::endl;
-		process_temp.remainingServiceTime = process_temp.arrivalTime;
-		process_temp.serviceTime = 0;
-		process_temp.priority = 0;
+		//std::cout << "start of init222" << std::endl;
+		process_temp->id = rand() % 900000 + 1;
+		//std::cout << "start of init2333" << std::endl;
+		process_temp->remainingServiceTime = process_temp->arrivalTime;
+		process_temp->serviceTime = 0;
+		process_temp->priority = 0;
 
 		//Make new event that has the arrival time of the process
-		struct event* temp = 0;
+		struct event* temp = new event;
 		temp->enter_time = genexp(average_arrival);
 		temp->time = genexp(process_lamda);
 		temp->type = 1;
-		temp->p = &process_temp;
+		temp->p = process_temp;
 		//Put event into event queue through scedule_event function
 		schedule_event(temp);
-		std::cout << "out of init2" << std::endl;
+		//std::cout << "out of init2" << std::endl;
 	}
 
-	std::cout << "out of init1" << std::endl;
+
+	//Print linked list to check if in order of time
+	struct event* temp4 = new event;
+	temp4 = head;
+	std::cout << "Before Check" << std::endl;
+	while (temp4 != nullptr)
+	{
+		std::cout << temp4->enter_time << std::endl;
+		temp4 = temp4->next;
+	}
+	std::cout << "After Check" << std::endl;
+
+	//std::cout << "out of init1" << std::endl;
 }
 ////////////////////////////////////////////////////////////////
 void generate_report()
@@ -220,7 +232,7 @@ void schedule_event(struct event* new1)
 			previous_node = head;
 			current_node = current_node->next;
 
-			if (current_node->enter_time <= new1->enter_time)
+			if (current_node->enter_time >= new1->enter_time)
 			{
 				previous_node->next = new1;
 				new1->next = current_node;
@@ -233,7 +245,9 @@ void schedule_event(struct event* new1)
 ////////////////////////////////////////////////////////////
 int run_sim()
 {
-
+	int counter = 0;
+	counter++;
+	std::cout << counter << std::endl;
 	struct event* eve;
 	while (head)
 	{
