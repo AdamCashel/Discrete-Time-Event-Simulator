@@ -45,9 +45,9 @@ void process_event1(struct event* eve);
 void process_event2(struct event* eve);
 void process_event3(struct event* eve);
 void process_event4(struct event* eve);
-void FCFS();
+void FCFS(struct event* current_event);
 void SRTF();
-void RR(int);
+void RR(struct event* current_event,int);
 
 ////////////////////////////////////////////////////////////////
 //Global variables
@@ -62,7 +62,7 @@ float total_throughput = 0;
 int algorithm_type;
 bool server_idle; //replace with using process* server pointing to the process being serviced, NULL indicates idle
 int readyque_count = 0; //Replace with FIFO queue (or more general, a priority queue) of processes (pointers to processes)
-
+float total_time = 0;
 //Alogrithms add events to the event queue
 
 ////////////////////////////////////////////////////////////////
@@ -101,9 +101,34 @@ void SRTF()
 
 ////////////////////////////////////////////////////////////////
 //RR
-void RR(int quantum_number)
+void RR(struct event* current_event, float quantum_number)
 {
 
+	struct process* new_process = new process;
+	struct event* new_event = new event;
+
+
+
+	//Have 2 Conditions
+	//(1) If Remaning burst time is less than or equal to quantum number scehdule completion event
+	//(2) Else remaining time is greater than qunatum number than subtract remaining time and
+	if (current_event->p->remainingServiceTime <= quantum_number)
+	{
+		new_event->enter_time = current_event->enter_time + quantum_number;
+		new_event->p = current_event->p;
+		new_event->type = 2;
+		new_event->p->remainingServiceTime = 0;
+	}
+	else
+	{
+		new_event->enter_time = current_event->enter_time + quantum_number;
+		new_event->p = current_event->p;
+		new_event->type = 1;
+		new_event->p->remainingServiceTime = new_event->p->remainingServiceTime - quantum_number;
+	}
+
+	
+	schedule_event(new_event);
 }
 
 ////////////////////////////////////////////////////////////////
@@ -113,6 +138,10 @@ void process_event1(struct event* eve)
 	if (algorithm_type == 1)
 	{
 		FCFS(eve);
+	}
+	if (algorithm_type == 3)
+	{
+		RR(eve, quantum_number);
 	}
 
 }
@@ -184,27 +213,27 @@ void init()
 	quantum number but will stop after 10,000 processes have been served by the given alogrithm */
 	for (int i = 0; i < 10000; i++)
 	{
-		//std::cout << "start of init2" << std::endl;
-		//Make new process
+		
 		process* process_temp = new process;
-		//process_temp->arrivalTime =
-		//std::cout << "start of init222" << std::endl;
+		
 		process_temp->id = i + 1;
-		//std::cout << "start of init2333" << std::endl;
-		process_temp->remainingServiceTime = process_temp->arrivalTime;
+		
+		
 		process_temp->serviceTime = 0;
 		process_temp->priority = 0;
 
-		//Make new event that has the arrival time of the process
+		
 		struct event* temp = new event;
 		temp->enter_time = genexp(average_arrival);
+		
 		process_temp->arrivalTime = temp->enter_time;
 		temp->time = genexp(process_lamda);
+		process_temp->remainingServiceTime = temp->time;
 		temp->type = 1;
 		temp->p = process_temp;
-		//Put event into event queue through scedule_event function
+		
 		schedule_event(temp);
-		//std::cout << "out of init2" << std::endl;
+		
 	}
 
 
@@ -213,20 +242,21 @@ void init()
 	temp4 = head;
 	
 	std::cout << "Before Check" << std::endl;
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 10000; i++)
 	{
 		std::cout << temp4->enter_time << std::endl;
 		temp4 = temp4->next;
 	}
-	std::cout << "After Check" << std::endl;
+	std::cout << "After Check" << std::endl; */
 
-	//std::cout << "out of init1" << std::endl; */
+	//std::cout << "out of init1" << std::endl; 
 }
 ////////////////////////////////////////////////////////////////
 void generate_report()
 {
 	// output statistics
 	float average_turnaround = 10000 / Total_turnaround;
+	total_throughput = 10000 / total_time;
 	std::cout << "Average Turnaround: " << average_turnaround << std::endl;
 	std::cout << "Total Throughput: " << total_throughput << std::endl;
 
@@ -282,6 +312,7 @@ int run_sim()
 	{
 		eve = head;
 		clock1 = eve->enter_time;
+		total_time = clock1;
 		switch (eve->type)
 		{
 		case EVENT1:
