@@ -3,6 +3,7 @@
 #include <math.h>
 #include <time.h>   
 #include <iostream>
+#include <fstream>
 
 ////////////////////////////////////////////////////////////////
 // sample events
@@ -57,6 +58,7 @@ float process_lamda;
 float average_arrival;
 float quantum_number;
 float Total_turnaround = 0;
+float total_throughput = 0;
 int algorithm_type;
 bool server_idle; //replace with using process* server pointing to the process being serviced, NULL indicates idle
 int readyque_count = 0; //Replace with FIFO queue (or more general, a priority queue) of processes (pointers to processes)
@@ -121,7 +123,13 @@ void process_event2(struct event* eve)
 {
 	//collect data
 	Total_turnaround += (clock1 - eve->p->arrivalTime);
-	std::cout << "Total Check: " << clock1 << " " << eve->enter_time << std::endl;
+	//std::cout << "Total Check: " << clock1 << " " << eve->enter_time << std::endl;
+
+	if(head->next == NULL)
+	{
+		float total_time = eve->enter_time;
+		total_throughput = 10000/total_time;
+	}
 }
 
 ////////////////////////////////////////////////////////////////
@@ -181,7 +189,7 @@ void init()
 		process* process_temp = new process;
 		//process_temp->arrivalTime =
 		//std::cout << "start of init222" << std::endl;
-		process_temp->id = rand() % 900000 + 1;
+		process_temp->id = i + 1;
 		//std::cout << "start of init2333" << std::endl;
 		process_temp->remainingServiceTime = process_temp->arrivalTime;
 		process_temp->serviceTime = 0;
@@ -220,6 +228,12 @@ void generate_report()
 	// output statistics
 	float average_turnaround = 10000 / Total_turnaround;
 	std::cout << "Average Turnaround: " << average_turnaround << std::endl;
+	std::cout << "Total Throughput: " << total_throughput << std::endl;
+
+	std::ofstream report_file;
+	report_file.open("report.csv", std::ofstream::app);
+	report_file << process_lamda << ", " << average_turnaround << ", " << total_throughput << std::endl;
+	report_file.close();
 }
 //////////////////////////////////////////////////////////////// 
 //schedules an event in the future
