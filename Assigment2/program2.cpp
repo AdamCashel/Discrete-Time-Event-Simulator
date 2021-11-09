@@ -114,7 +114,7 @@ void RR(struct event* current_event, float quantum_number)
 	//(2) Else remaining time is greater than qunatum number than subtract remaining time and
 	if (current_event->p->remainingServiceTime <= quantum_number)
 	{
-		new_event->enter_time = current_event->enter_time + quantum_number;
+		new_event->enter_time = current_event->enter_time + (quantum_number - new_event->p->remainingServiceTime);
 		new_event->p = current_event->p;
 		new_event->type = 2;
 		new_event->p->remainingServiceTime = 0;
@@ -157,6 +157,7 @@ void process_event2(struct event* eve)
 	if(head->next == NULL)
 	{
 		float total_time = eve->enter_time;
+		std::cout << "Here: " << total_time << std::endl;
 		total_throughput = 10000/total_time;
 	}
 }
