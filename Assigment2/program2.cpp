@@ -96,7 +96,7 @@ void FCFS(struct event* current_event)
 void SRTF()
 {
 	//Rearrange ready queue list every interation from least remaining time to most remaining time 
-
+	
 }
 
 ////////////////////////////////////////////////////////////////
@@ -143,7 +143,10 @@ void process_event1(struct event* eve)
 	{
 		RR(eve, quantum_number);
 	}
-
+	if (algorithm_type == 2)
+	{
+		SRTF();
+	}
 }
 
 ////////////////////////////////////////////////////////////////
