@@ -40,19 +40,20 @@ struct event {
 void init();
 int run_sim();
 void generate_report();
+void schedule_readyQue(struct event* eve);
 void schedule_event(struct event*);
 void process_event1(struct event* eve);
 void process_event2(struct event* eve);
 void process_event3(struct event* eve);
 void process_event4(struct event* eve);
 void FCFS(struct event* current_event);
-void SRTF();
-void RR(struct event* current_event,int);
+void SRTF(struct event* current_event);
+void RR(struct event* current_event,float);
 
 ////////////////////////////////////////////////////////////////
 //Global variables
 struct event* head = new event;// head of event queue
-struct event* readyque_head;
+struct event* readyque_head = new event; //head of ready queue
 float clock1; // simulation clock
 float process_lamda;
 float average_arrival;
@@ -93,10 +94,22 @@ void FCFS(struct event* current_event)
 
 ////////////////////////////////////////////////////////////////
 //SRTF
-void SRTF()
+void SRTF(struct event* current_event)
 {
 	//Rearrange ready queue list every interation from least remaining time to most remaining time 
-	
+	struct process* new_process = new process;
+	struct event* new_event = new event;
+
+	new_event->enter_time = current_event->enter_time;
+	new_event->p = current_event->p;
+	new_event->time = current_event->time;
+	new_event->next = NULL;
+
+
+	//New Schedule Method that deals with Ready Queue
+	schedule_readyQue(new_event);
+
+
 }
 
 ////////////////////////////////////////////////////////////////
@@ -145,7 +158,7 @@ void process_event1(struct event* eve)
 	}
 	if (algorithm_type == 2)
 	{
-		SRTF();
+		SRTF(eve);
 	}
 }
 
@@ -304,6 +317,44 @@ void schedule_event(struct event* new1)
 			new1->next = current_node;
 		}
 		
+	}
+}
+
+//////////////////////////////////////////////////////////////// 
+//schedules an event in the future
+void schedule_readyQue(struct event* new1)
+{
+	// insert event in the ready queue in its order of time
+	//Check if theres an event after the event queue head node, if not place event after head node
+	//If there is a node then place the node based on the time
+	if (readyque_head == NULL)
+	{
+		readyque_head = new1;
+	}
+	else
+	{
+		//Place the input event based on the enter_time of the even in the orgainized queue based on enter_time
+		struct event* current_node = readyque_head;
+		struct event* previous_node = NULL;
+		bool found = true;
+
+		while (current_node != NULL && current_node->enter_time < new1->enter_time)
+		{
+			previous_node = current_node;
+			current_node = current_node->next;
+		}
+
+		if (previous_node == NULL)
+		{
+			readyque_head = new1;
+			new1->next = current_node;
+		}
+		else
+		{
+			previous_node->next = new1;
+			new1->next = current_node;
+		}
+
 	}
 }
 
