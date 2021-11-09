@@ -70,20 +70,28 @@ void FCFS(struct event* current_event)
 	//Keep track of top node in ready queue
 	//struct event* top = readyque_head;
 
-	struct process* current_process = new process;
+	/*struct process* current_process = new process;
 	struct event* new_event = new event;
 	current_process = current_event->p;
 
 	new_event->enter_time = (current_event->enter_time) + (current_process->serviceTime);
 	new_event->type = 2; //Event type is completion
 	//Call schedule event and place the event into the event queue
-	schedule_event(current_event);
+	schedule_event(current_event); */
+
+	//Add event at the point where the event is completed
+	struct process* new_process = new process;
+
+	struct event* new_event = new event;
+	new_event->enter_time = (current_event->enter_time) + (current_event->time);
+
 }
 
 ////////////////////////////////////////////////////////////////
 //SRTF
 void SRTF()
 {
+	//Rearrange ready queue list every interation from least remaining time to most remaining time 
 
 }
 
@@ -189,18 +197,18 @@ void init()
 
 
 	//Print linked list to check if in order of time
-	struct event* temp4 = new event;
+	/*struct event* temp4 = new event;
 	temp4 = head;
 	
 	std::cout << "Before Check" << std::endl;
-	while (temp4 != nullptr)
+	for (int i = 0; i < 5; i++)
 	{
 		std::cout << temp4->enter_time << std::endl;
 		temp4 = temp4->next;
 	}
 	std::cout << "After Check" << std::endl;
 
-	//std::cout << "out of init1" << std::endl;
+	//std::cout << "out of init1" << std::endl; */
 }
 ////////////////////////////////////////////////////////////////
 void generate_report()
@@ -250,9 +258,7 @@ void schedule_event(struct event* new1)
 ////////////////////////////////////////////////////////////
 int run_sim()
 {
-	int counter = 0;
-	counter++;
-	std::cout << counter << std::endl;
+	
 	struct event* eve;
 	while (head)
 	{
@@ -303,6 +309,7 @@ int main(int argc, char* argv[])
 
 	init();
 	std::cout << "end of init" << std::endl;
+	std::cout << "start of sim" << std::endl;
 	run_sim();
 	std::cout << "end of sim" << std::endl;
 	generate_report();
