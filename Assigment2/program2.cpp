@@ -85,6 +85,7 @@ void FCFS(struct event* current_event)
 	struct event* new_event = new event;
 	new_event->enter_time = (current_event->enter_time) + (current_event->time);
 	new_event->type = 2;
+	new_event->p = current_event->p;
 	schedule_event(new_event);
 }
 
@@ -119,7 +120,7 @@ void process_event1(struct event* eve)
 void process_event2(struct event* eve)
 {
 	//collect data
-	Total_turnaround += (clock1 - eve->enter_time);
+	Total_turnaround += (clock1 - eve->p->arrivalTime);
 	std::cout << "Total Check: " << clock1 << " " << eve->enter_time << std::endl;
 }
 
@@ -189,6 +190,7 @@ void init()
 		//Make new event that has the arrival time of the process
 		struct event* temp = new event;
 		temp->enter_time = genexp(average_arrival);
+		process_temp->arrivalTime = temp->enter_time;
 		temp->time = genexp(process_lamda);
 		temp->type = 1;
 		temp->p = process_temp;
