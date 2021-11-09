@@ -81,10 +81,11 @@ void FCFS(struct event* current_event)
 
 	//Add event at the point where the event is completed
 	struct process* new_process = new process;
-
+	//new_process->arrivalTime = current_event
 	struct event* new_event = new event;
 	new_event->enter_time = (current_event->enter_time) + (current_event->time);
-
+	new_event->type = 2;
+	schedule_event(new_event);
 }
 
 ////////////////////////////////////////////////////////////////
@@ -119,6 +120,7 @@ void process_event2(struct event* eve)
 {
 	//collect data
 	Total_turnaround += (clock1 - eve->enter_time);
+	std::cout << "Total Check: " << clock1 << " " << eve->enter_time << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -215,7 +217,7 @@ void generate_report()
 {
 	// output statistics
 	float average_turnaround = 10000 / Total_turnaround;
-	std::cout << average_turnaround << std::endl;
+	std::cout << "Average Turnaround: " << average_turnaround << std::endl;
 }
 //////////////////////////////////////////////////////////////// 
 //schedules an event in the future
@@ -263,7 +265,7 @@ int run_sim()
 	while (head)
 	{
 		eve = head;
-		clock1 = eve->time;
+		clock1 = eve->enter_time;
 		switch (eve->type)
 		{
 		case EVENT1:
