@@ -40,6 +40,7 @@ struct event {
 void init();
 int run_sim();
 void generate_report();
+void SRTF_Helper();
 void schedule_readyQue(struct event* eve);
 void schedule_event(struct event*);
 void process_event1(struct event* eve);
@@ -48,7 +49,7 @@ void process_event3(struct event* eve);
 void process_event4(struct event* eve);
 void FCFS(struct event* current_event);
 void SRTF(struct event* current_event);
-void RR(struct event* current_event,float);
+void RR(struct event* current_event, float);
 
 ////////////////////////////////////////////////////////////////
 //Global variables
@@ -76,7 +77,6 @@ void FCFS(struct event* current_event)
 	/*struct process* current_process = new process;
 	struct event* new_event = new event;
 	current_process = current_event->p;
-
 	new_event->enter_time = (current_event->enter_time) + (current_process->serviceTime);
 	new_event->type = 2; //Event type is completion
 	//Call schedule event and place the event into the event queue
@@ -104,12 +104,50 @@ void SRTF(struct event* current_event)
 	new_event->p = current_event->p;
 	new_event->time = current_event->time;
 	new_event->next = NULL;
+	new_event->type = 3;
+
+	schedule_readyQue(new_event); //Function call to put even in order of time
+	
+	//Function call to run readyQue for X amount of time
+	SRTF_Helper();
 
 
-	//New Schedule Method that deals with Ready Queue
-	schedule_readyQue(new_event);
+}
 
-
+////////////////////////////////////////////////////////////////
+//SRTF Helper to interate the SRFT in the ready queue for as along as the 
+void SRTF_Helper()
+{
+	
+	float past_clock = 0;
+	float clock_runtime = 0;
+	clock_runtime = clock1 - past_clock;
+	if (readyque_head)
+	{
+		//run until there isnt a ready queue node or runtime is 0
+		while (clock_runtime != 0 || readyque_head)
+		{
+			//Run while checking if the next node is smaller time than current node
+			//Condtion if checking if node after is small than ready queue head
+			if (readyque_head->next->p->remainingServiceTime < readyque_head->p->remainingServiceTime)
+			{
+				struct event* new_event = new event;
+				new_event = readyque_head->next;
+				schedule_event(new_event);
+			}
+			else
+			{
+				float time_sprint = 0; //The time different between the ready_que head node and the node after to get the sprint time 
+				time_sprint = (readyque_head->p->remainingServiceTime) - (readyque_head->next->p->remainingServiceTime);
+			}
+			
+		}
+	}
+	else
+	{
+		std::cout << "readyqueue head empty" << std::endl;
+	}
+	past_clock = clock1;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -140,7 +178,7 @@ void RR(struct event* current_event, float quantum_number)
 		new_event->p->remainingServiceTime = new_event->p->remainingServiceTime - quantum_number;
 	}
 
-	
+
 	schedule_event(new_event);
 }
 
@@ -170,19 +208,19 @@ void process_event2(struct event* eve)
 	Total_turnaround += (clock1 - eve->p->arrivalTime);
 	//std::cout << "Total Check: " << clock1 << " " << eve->enter_time << std::endl;
 
-	if(head->next == NULL)
+	if (head->next == NULL)
 	{
 		float total_time = eve->enter_time;
 		std::cout << "Here: " << total_time << std::endl;
-		total_throughput = 10000/total_time;
+		total_throughput = 10000 / total_time;
 	}
 }
 
 ////////////////////////////////////////////////////////////////
-//
+//Put events that are of type 1 into ready queue
 void process_event3(struct event* eve)
 {
-
+	
 }
 
 ////////////////////////////////////////////////////////////////
@@ -230,34 +268,34 @@ void init()
 	quantum number but will stop after 10,000 processes have been served by the given alogrithm */
 	for (int i = 0; i < 10000; i++)
 	{
-		
+
 		process* process_temp = new process;
-		
+
 		process_temp->id = i + 1;
-		
-		
+
+
 		process_temp->serviceTime = 0;
 		process_temp->priority = 0;
 
-		
+
 		struct event* temp = new event;
 		temp->enter_time = genexp(average_arrival);
-		
+
 		process_temp->arrivalTime = temp->enter_time;
 		temp->time = genexp(process_lamda);
 		process_temp->remainingServiceTime = temp->time;
 		temp->type = 1;
 		temp->p = process_temp;
-		
+
 		schedule_event(temp);
-		
+
 	}
 
 
 	//Print linked list to check if in order of time
 	/*struct event* temp4 = new event;
 	temp4 = head;
-	
+
 	std::cout << "Before Check" << std::endl;
 	for (int i = 0; i < 10000; i++)
 	{
@@ -316,7 +354,7 @@ void schedule_event(struct event* new1)
 			previous_node->next = new1;
 			new1->next = current_node;
 		}
-		
+
 	}
 }
 
@@ -338,7 +376,7 @@ void schedule_readyQue(struct event* new1)
 		struct event* previous_node = NULL;
 		bool found = true;
 
-		while (current_node != NULL && current_node->enter_time < new1->enter_time)
+		while (current_node != NULL && current_node->p->remainingServiceTime < new1->p->remainingServiceTime)
 		{
 			previous_node = current_node;
 			current_node = current_node->next;
@@ -361,7 +399,7 @@ void schedule_readyQue(struct event* new1)
 ////////////////////////////////////////////////////////////
 int run_sim()
 {
-	
+
 	struct event* eve;
 	while (head)
 	{
@@ -400,7 +438,7 @@ int main(int argc, char* argv[])
 	//Fourth Argument: quantum value (used for RR only)
 	//parse arguments
 	//If algorithm_type == 1 run First Come First Serve , If algorithm_type == 2 run Shortest Remaining Time First, If algorithm_type == 3 run Round Robin with quantum value
-	
+
 	std::cout << "start" << std::endl;
 	algorithm_type = atoi(argv[1]);
 	process_lamda = atoi(argv[2]);
