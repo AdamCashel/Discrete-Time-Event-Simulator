@@ -139,6 +139,12 @@ void SRTF_Helper()
 			{
 				float time_sprint = 0; //The time different between the ready_que head node and the node after to get the sprint time 
 				time_sprint = (readyque_head->p->remainingServiceTime) - (readyque_head->next->p->remainingServiceTime);
+				readyque_head->p->remainingServiceTime = (readyque_head->p->remainingServiceTime) - time_sprint;
+				struct event* temp1_event = new event;
+				temp1_event = readyque_head;
+				readyque_head = readyque_head->next;
+				free(temp1_event); //delete eve
+				temp1_event = NULL;
 			}
 			
 		}
@@ -204,15 +210,30 @@ void process_event1(struct event* eve)
 //process completion
 void process_event2(struct event* eve)
 {
-	//collect data
-	Total_turnaround += (clock1 - eve->p->arrivalTime);
-	//std::cout << "Total Check: " << clock1 << " " << eve->enter_time << std::endl;
-
-	if (head->next == NULL)
+	if (algorithm_type == (1 || 3))
 	{
-		float total_time = eve->enter_time;
-		std::cout << "Here: " << total_time << std::endl;
-		total_throughput = 10000 / total_time;
+		//collect data
+		Total_turnaround += (clock1 - eve->p->arrivalTime);
+		//std::cout << "Total Check: " << clock1 << " " << eve->enter_time << std::endl;
+
+		if (head->next == NULL)
+		{
+			float total_time = eve->enter_time;
+			std::cout << "Here: " << total_time << std::endl;
+			total_throughput = 10000 / total_time;
+		}
+	}
+	if (algorithm_type == 2)
+	{
+		//collect data
+		Total_turnaround += (clock1 - eve->p->arrivalTime);
+
+		if (readyque_head->next == NULL)
+		{
+			float total_time2 = eve->enter_time;
+			std::cout << "Here: " << total_time2 << std::endl;
+			total_throughput = 10000 / total_time2;
+		}
 	}
 }
 
