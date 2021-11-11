@@ -210,7 +210,8 @@ void process_event1(struct event* eve)
 //process completion
 void process_event2(struct event* eve)
 {
-	if (algorithm_type == (1 || 3))
+	
+	if ((algorithm_type == 1) || (algorithm_type == 3))
 	{
 		//collect data
 		Total_turnaround += (clock1 - eve->p->arrivalTime);
@@ -231,7 +232,7 @@ void process_event2(struct event* eve)
 		if (readyque_head->next == NULL)
 		{
 			float total_time2 = eve->enter_time;
-			std::cout << "Here: " << total_time2 << std::endl;
+			//std::cout << "Here: " << total_time2 << std::endl;
 			total_throughput = 10000 / total_time2;
 		}
 	}
@@ -278,8 +279,9 @@ void init()
 
 	// initialize all varilables, states, and end conditions
 	// schedule first events
-	head->enter_time = 0;
+	//head->enter_time = 0;
 	//std::cout << "start of init" << std::endl;
+	head = NULL;
 	bool server_idle = false;
 	clock1 = 0;
 	//std::cout << "start of init5" << std::endl;
@@ -441,7 +443,7 @@ int run_sim()
 
 		default:
 			// error 
-			std::cout << "Error" << std::endl;
+			std::cout << "Error: unknown event type: " << eve->type << std::endl;
 		}
 
 		head = eve->next;
