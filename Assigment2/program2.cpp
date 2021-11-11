@@ -21,6 +21,7 @@ struct process {
 	float serviceTime = 0;
 	float remainingServiceTime = 0;
 	int priority = 0;
+	int new_check = 1;
 	//add more
 };
 
@@ -190,6 +191,13 @@ void RR(struct event* current_event, float quantum_number)
 	struct process* new_process = new process;
 	struct event* new_event = new event;
 
+	if (current_event->p->new_check == 1)
+	{
+		current_event->p->new_check = 0;
+		currentnum_processes++;
+		averagenum_processes += currentnum_processes;
+		avergaenum_counter++;
+	}
 
 
 	//Have 2 Conditions
@@ -218,11 +226,12 @@ void RR(struct event* current_event, float quantum_number)
 //Arrival Event
 void process_event1(struct event* eve)
 {
-	currentnum_processes++;
-	averagenum_processes += currentnum_processes;
-	avergaenum_counter++;
+	
 	if (algorithm_type == 1)
 	{
+		currentnum_processes++;
+		averagenum_processes += currentnum_processes;
+		avergaenum_counter++;
 		FCFS(eve);
 	}
 	if (algorithm_type == 3)
@@ -231,6 +240,9 @@ void process_event1(struct event* eve)
 	}
 	if (algorithm_type == 2)
 	{
+		currentnum_processes++;
+		averagenum_processes += currentnum_processes;
+		avergaenum_counter++;
 		SRTF(eve);
 	}
 }
