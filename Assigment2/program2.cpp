@@ -59,6 +59,9 @@ float clock1; // simulation clock
 float process_lamda;
 float average_arrival;
 float quantum_number;
+int currentnum_processes = 0;
+int averagenum_processes = 0;
+int avergaenum_counter = 0;
 float Total_turnaround = 0;
 float total_throughput = 0;
 int algorithm_type;
@@ -106,10 +109,10 @@ void SRTF(struct event* current_event)
 	new_event->time = current_event->time;
 	new_event->next = NULL;
 	new_event->type = 3;
-	
+
 
 	schedule_readyQue(new_event); //Function call to put even in order of time
-	
+
 	//Function call to run readyQue for X amount of time
 	SRTF_Helper();
 
@@ -192,6 +195,9 @@ void RR(struct event* current_event, float quantum_number)
 //Arrival Event
 void process_event1(struct event* eve)
 {
+	currentnum_processes++;
+	averagenum_processes += currentnum_processes;
+	avergaenum_counter++;
 	if (algorithm_type == 1)
 	{
 		FCFS(eve);
@@ -210,7 +216,7 @@ void process_event1(struct event* eve)
 //process completion
 void process_event2(struct event* eve)
 {
-	
+	currentnum_processes--;
 	if ((algorithm_type == 1) || (algorithm_type == 3))
 	{
 		//collect data
@@ -243,7 +249,7 @@ void process_event2(struct event* eve)
 //Put events that are of type 1 into ready queue
 void process_event3(struct event* eve)
 {
-	
+
 }
 
 ////////////////////////////////////////////////////////////////
@@ -320,7 +326,6 @@ void init()
 	//Print linked list to check if in order of time
 	/*struct event* temp4 = new event;
 	temp4 = head;
-
 	std::cout << "Before Check" << std::endl;
 	for (int i = 0; i < 10000; i++)
 	{
@@ -334,12 +339,14 @@ void init()
 ////////////////////////////////////////////////////////////////
 void generate_report()
 {
+	averagenum_processes = averagenum_processes / avergaenum_counter;
+
 	// output statistics
 	float average_turnaround = 10000 / Total_turnaround;
 	total_throughput = 10000 / total_time;
 	std::cout << "Average Turnaround: " << average_turnaround << std::endl;
 	std::cout << "Total Throughput: " << total_throughput << std::endl;
-
+	std::cout << "Average number of processes: " << averagenum_processes << std::endl;
 	std::ofstream report_file;
 	report_file.open("report.csv", std::ofstream::app);
 	report_file << process_lamda << ", " << average_turnaround << ", " << total_throughput << std::endl;
@@ -414,7 +421,7 @@ void schedule_readyQue(struct event* new1)
 			previous_node = current_node;
 			current_node = current_node->next;
 		}
-		
+
 		if (current_node == NULL)
 		{
 			if (previous_node->enter_time > new1->enter_time)
@@ -426,7 +433,7 @@ void schedule_readyQue(struct event* new1)
 			{
 				previous_node->next = new1;
 			}
-		}		
+		}
 		else
 		{
 			previous_node->next = new1;
