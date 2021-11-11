@@ -65,6 +65,7 @@ int algorithm_type;
 bool server_idle; //replace with using process* server pointing to the process being serviced, NULL indicates idle
 int readyque_count = 0; //Replace with FIFO queue (or more general, a priority queue) of processes (pointers to processes)
 float total_time = 0;
+int completed_process = 0;
 //Alogrithms add events to the event queue
 
 ////////////////////////////////////////////////////////////////
@@ -105,6 +106,7 @@ void SRTF(struct event* current_event)
 	new_event->time = current_event->time;
 	new_event->next = NULL;
 	new_event->type = 3;
+	
 
 	schedule_readyQue(new_event); //Function call to put even in order of time
 	
@@ -118,7 +120,6 @@ void SRTF(struct event* current_event)
 //SRTF Helper to interate the SRFT in the ready queue for as along as the 
 void SRTF_Helper()
 {
-	
 	float past_clock = 0;
 	float clock_runtime = 0;
 	clock_runtime = clock1 - past_clock;
@@ -146,7 +147,6 @@ void SRTF_Helper()
 				free(temp1_event); //delete eve
 				temp1_event = NULL;
 			}
-			
 		}
 	}
 	else
@@ -215,13 +215,14 @@ void process_event2(struct event* eve)
 	{
 		//collect data
 		Total_turnaround += (clock1 - eve->p->arrivalTime);
+		completed_process++;
 		//std::cout << "Total Check: " << clock1 << " " << eve->enter_time << std::endl;
 
 		if (head->next == NULL)
 		{
 			float total_time = eve->enter_time;
 			//std::cout << "Here: " << total_time << std::endl;
-			total_throughput = 10000 / total_time;
+			total_throughput = completed_process / total_time;
 		}
 	}
 	if (algorithm_type == 2)
@@ -233,7 +234,7 @@ void process_event2(struct event* eve)
 		{
 			float total_time2 = eve->enter_time;
 			//std::cout << "Here: " << total_time2 << std::endl;
-			total_throughput = 10000 / total_time2;
+			total_throughput = completed_process / total_time2;
 		}
 	}
 }
@@ -282,6 +283,7 @@ void init()
 	//head->enter_time = 0;
 	//std::cout << "start of init" << std::endl;
 	head = NULL;
+	readyque_head = NULL;
 	bool server_idle = false;
 	clock1 = 0;
 	//std::cout << "start of init5" << std::endl;
@@ -403,8 +405,8 @@ void schedule_readyQue(struct event* new1)
 	else
 	{
 		//Place the input event based on the enter_time of the even in the orgainized queue based on enter_time
-		struct event* current_node = readyque_head;
-		struct event* previous_node = NULL;
+		struct event* current_node = readyque_head->next;
+		struct event* previous_node = readyque_head;
 		bool found = true;
 
 		while (current_node != NULL && current_node->p->remainingServiceTime < new1->p->remainingServiceTime)
@@ -412,12 +414,19 @@ void schedule_readyQue(struct event* new1)
 			previous_node = current_node;
 			current_node = current_node->next;
 		}
-
-		if (previous_node == NULL)
+		
+		if (current_node == NULL)
 		{
-			readyque_head = new1;
-			new1->next = current_node;
-		}
+			if (previous_node->enter_time > new1->enter_time)
+			{
+				new1->next = previous_node;
+				previous_node->next = NULL;
+			}
+			else
+			{
+				previous_node->next = new1;
+			}
+		}		
 		else
 		{
 			previous_node->next = new1;
