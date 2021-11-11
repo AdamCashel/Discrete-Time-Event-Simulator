@@ -40,7 +40,7 @@ struct event {
 void init();
 int run_sim();
 void generate_report();
-void SRTF_Helper();
+void SRTF_Helper(struct event* current_event);
 void schedule_readyQue(struct event* eve);
 void schedule_event(struct event*);
 void process_event1(struct event* eve);
@@ -59,9 +59,9 @@ float clock1; // simulation clock
 float process_lamda;
 float average_arrival;
 float quantum_number;
-int currentnum_processes = 0;
-int averagenum_processes = 0;
-int avergaenum_counter = 0;
+int currentnum_processes = 0; //Holds how many current processes are there
+int averagenum_processes = 0; //A counter for the total num of process at each iteration
+int avergaenum_counter = 0; //How many interations there were
 float Total_turnaround = 0;
 float total_throughput = 0;
 int algorithm_type;
@@ -114,14 +114,14 @@ void SRTF(struct event* current_event)
 	schedule_readyQue(new_event); //Function call to put even in order of time
 
 	//Function call to run readyQue for X amount of time
-	SRTF_Helper();
+	SRTF_Helper(current_event);
 
 
 }
 
 ////////////////////////////////////////////////////////////////
 //SRTF Helper to interate the SRFT in the ready queue for as along as the 
-void SRTF_Helper()
+void SRTF_Helper(struct event* current_event)
 {
 	float past_clock = 0;
 	float clock_runtime = 0;
@@ -129,28 +129,51 @@ void SRTF_Helper()
 	if (readyque_head)
 	{
 		//run until there isnt a ready queue node or runtime is 0
-		while (clock_runtime != 0 || readyque_head)
-		{
+		//while (clock_runtime != 0 || readyque_head)
+		//{
 			//Run while checking if the next node is smaller time than current node
 			//Condtion if checking if node after is small than ready queue head
-			if (readyque_head->next->p->remainingServiceTime < readyque_head->p->remainingServiceTime)
+			if (readyque_head->next == NULL)
 			{
+				//Add to schedule event
 				struct event* new_event = new event;
-				new_event = readyque_head->next;
-				schedule_event(new_event);
+				if (current_event->p->remainingServiceTime <= head->p->arrivalTime)
+				{
+					new_event->p = current_event->p;
+					new_event->enter_time = current_event->enter_time + current_event->p->remainingServiceTime;
+					new_event->type = 2;
+					new_event->time = current_event->time;
+					new_event->next = NULL;
+					schedule_event(new_event);
+				}
+				else
+				{
+					new_event->p = current_event->p;
+					new_event->enter_time = current_event->enter_time + current_event->p->remainingServiceTime;
+					new_event->type = 1;
+					new_event->time = current_event->time;
+					new_event->next = NULL;
+					schedule_readyQue(new_event);
+				}
 			}
 			else
 			{
+				//int temp = 0;
+				//temp++;
+				//std::cout << "temp: " << temp << std::endl;
 				float time_sprint = 0; //The time different between the ready_que head node and the node after to get the sprint time 
 				time_sprint = (readyque_head->p->remainingServiceTime) - (readyque_head->next->p->remainingServiceTime);
 				readyque_head->p->remainingServiceTime = (readyque_head->p->remainingServiceTime) - time_sprint;
 				struct event* temp1_event = new event;
 				temp1_event = readyque_head;
-				readyque_head = readyque_head->next;
-				free(temp1_event); //delete eve
-				temp1_event = NULL;
+				temp1_event->type = 2;
+				temp1_event->enter_time = readyque_head->p->remainingServiceTime;
+				//readyque_head = readyque_head->next;
+				//free(temp1_event); //delete eve
+				//temp1_event = NULL;
+				schedule_readyQue(temp1_event);
 			}
-		}
+		//}
 	}
 	else
 	{
@@ -343,7 +366,9 @@ void generate_report()
 
 	// output statistics
 	float average_turnaround = 10000 / Total_turnaround;
+	average_turnaround = abs(average_turnaround);
 	total_throughput = 10000 / total_time;
+	total_throughput = abs(total_throughput);
 	std::cout << "Average Turnaround: " << average_turnaround << std::endl;
 	std::cout << "Total Throughput: " << total_throughput << std::endl;
 	std::cout << "Average number of processes: " << averagenum_processes << std::endl;
