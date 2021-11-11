@@ -86,7 +86,7 @@ void FCFS(struct event* current_event)
 	struct process* new_process = new process;
 	//new_process->arrivalTime = current_event
 	struct event* new_event = new event;
-	new_event->enter_time = (current_event->enter_time) + (current_event->time);
+	new_event->enter_time = (current_event->enter_time) + (current_event->p->remainingServiceTime);
 	new_event->type = 2;
 	new_event->p = current_event->p;
 	schedule_event(new_event);
@@ -220,7 +220,7 @@ void process_event2(struct event* eve)
 		if (head->next == NULL)
 		{
 			float total_time = eve->enter_time;
-			std::cout << "Here: " << total_time << std::endl;
+			//std::cout << "Here: " << total_time << std::endl;
 			total_throughput = 10000 / total_time;
 		}
 	}
@@ -353,12 +353,13 @@ void schedule_event(struct event* new1)
 	if (head == NULL)
 	{
 		head = new1;
+		head->enter_time = clock1;
 	}
 	else
 	{
 		//Place the input event based on the enter_time of the even in the orgainized queue based on enter_time
-		struct event* current_node = head;
-		struct event* previous_node = NULL;
+		struct event* current_node = head->next;
+		struct event* previous_node = head;
 		bool found = true;
 
 		while (current_node != NULL && current_node->enter_time < new1->enter_time)
@@ -367,10 +368,17 @@ void schedule_event(struct event* new1)
 			current_node = current_node->next;
 		}
 
-		if (previous_node == NULL)
+		if (current_node == NULL)
 		{
-			head = new1;
-			new1->next = current_node;
+			if (previous_node->enter_time > new1->enter_time)
+			{
+				new1->next = previous_node;
+				previous_node->next = NULL;
+			}
+			else
+			{
+				previous_node->next = new1;
+			}
 		}
 		else
 		{
@@ -463,13 +471,13 @@ int main(int argc, char* argv[])
 	//If algorithm_type == 1 run First Come First Serve , If algorithm_type == 2 run Shortest Remaining Time First, If algorithm_type == 3 run Round Robin with quantum value
 
 	std::cout << "start" << std::endl;
-	algorithm_type = atoi(argv[1]);
-	process_lamda = atoi(argv[2]);
-	average_arrival = atoi(argv[3]);
+	algorithm_type = atof(argv[1]);
+	process_lamda = atof(argv[2]);
+	average_arrival = atof(argv[3]);
 
 	if (argc == 5)
 	{
-		quantum_number = atoi(argv[4]);
+		quantum_number = atof(argv[4]);
 	}
 
 	init();
