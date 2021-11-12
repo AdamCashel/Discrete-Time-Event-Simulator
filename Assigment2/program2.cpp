@@ -182,6 +182,7 @@ void SRTF_Helper(struct event* current_event)
 				//free(temp1_event); //delete eve
 				//temp1_event = NULL;
 				schedule_readyQue(temp1_event);
+				Total_turnaround += (clock1 - readyque_head->p->arrivalTime);
 			}
 		//}
 	}
@@ -392,7 +393,7 @@ void generate_report()
 	std::cout << "Average number of processes: " << averagenum_processes << std::endl;
 	std::ofstream report_file;
 	report_file.open("report.csv", std::ofstream::app);
-	report_file << process_lamda << ", " << average_turnaround << ", " << total_throughput << std::endl;
+	report_file << process_lamda << ", " << average_turnaround << ", " << total_throughput << ", " << averagenum_processes << std::endl;
 	report_file.close();
 }
 //////////////////////////////////////////////////////////////// 
