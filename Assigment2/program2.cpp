@@ -105,14 +105,23 @@ void SRTF(struct event* current_event)
 	struct process* new_process = new process;
 	struct event* new_event = new event;
 
+	if (current_event->p->new_check == 1)
+	{
+		current_event->p->new_check = 0;
+		currentnum_processes++;
+		averagenum_processes += currentnum_processes;
+		avergaenum_counter++;
+	}
+
 	new_event->enter_time = current_event->enter_time;
 	new_event->p = current_event->p;
 	new_event->time = current_event->time;
 	new_event->next = NULL;
 	new_event->type = 3;
+	new_event->p->new_check = current_event->p->new_check;
 
 
-	schedule_readyQue(new_event); //Function call to put even in order of time
+	schedule_readyQue(new_event); //Function call to put even in order of shortest time
 
 	//Function call to run readyQue for X amount of time
 	SRTF_Helper(current_event);
@@ -145,7 +154,7 @@ void SRTF_Helper(struct event* current_event)
 					new_event->type = 2;
 					new_event->time = current_event->time;
 					new_event->next = NULL;
-					schedule_event(new_event);
+					schedule_readyQue(new_event);
 				}
 				else
 				{
@@ -240,9 +249,6 @@ void process_event1(struct event* eve)
 	}
 	if (algorithm_type == 2)
 	{
-		currentnum_processes++;
-		averagenum_processes += currentnum_processes;
-		avergaenum_counter++;
 		SRTF(eve);
 	}
 }
